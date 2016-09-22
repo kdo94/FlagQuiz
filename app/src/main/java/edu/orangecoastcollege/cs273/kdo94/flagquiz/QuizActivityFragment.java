@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 public class QuizActivityFragment extends Fragment {
 
     public QuizActivityFragment() {
+
+
     }
 
     @Override
