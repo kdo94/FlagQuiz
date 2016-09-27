@@ -1,6 +1,8 @@
 package edu.orangecoastcollege.cs273.kdo94.flagquiz;
 
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.util.Set;
+
+import static android.R.attr.key;
+import static edu.orangecoastcollege.cs273.kdo94.flagquiz.R.id.fab;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -46,7 +51,20 @@ public class QuizActivity extends AppCompatActivity {
                 registerOnSharedPreferenceChangeListener(
                         preferencesChangedListener);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        // Determine the screen size
+        int screenSize = getResources().getConfiguration().screenLayout &
+                Configuration.SCREENLAYOUT_SIZE_MASK;
+
+        // If device is a tablet, set phoneDevice to false
+        if (screenSize == Configuration.SCREENLAYOUT_SIZE_XLARGE ||
+                screenSize == Configuration.SCREENLAYOUT_SIZE_LARGE)
+            phoneDevice = false; // A tablet sized phone
+
+        // If running on a phone-sized device, allow only portrait orientation
+        if(phoneDevice)
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -57,11 +75,32 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(preferenceChanged){
+            // Now that the default preferences have been set up,
+            // initialize QuizActivityFragment and start the quiz
+            QuizActivityFragment quizFragment = (QuizActivityFragment)
+                    getSupportFragmentManager().findFragmentById(R.id.quizFragment);
+            quizFragment.updateGuessRows(
+                    PreferenceManager.getDefaultSharedPreferences(this));
+            quizFragment.updateRegions(
+                    PreferenceManager.getDefaultSharedPreferences(this));
+            quizFragment.resetQuiz();
+            preferenceChanged = false;
+            )
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_quiz, menu);
         return true;
     }
+
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -103,6 +142,6 @@ public class QuizActivity extends AppCompatActivity {
                         }
                     }
                 }
-            }
+            };
 
 }
