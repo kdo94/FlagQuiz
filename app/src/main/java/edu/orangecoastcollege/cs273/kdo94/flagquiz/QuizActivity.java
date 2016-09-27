@@ -1,5 +1,6 @@
 package edu.orangecoastcollege.cs273.kdo94.flagquiz;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -12,11 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.Set;
 
 import static android.R.attr.key;
-import static edu.orangecoastcollege.cs273.kdo94.flagquiz.R.id.fab;
+import static android.R.attr.settingsActivity;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -95,15 +97,24 @@ public class QuizActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_quiz, menu);
-        return true;
+        // Get teh device's current orientation
+        int orientation = getResources().getConfiguration().orientation;
+
+        // Display teh app's menu only in portrait orientation
+        if(orientation == Configuration.ORIENTATION_PORTRAIT){
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.menu_quiz, menu);
+            return true;
+        }
+        else
+            return false;
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+       Intent preferencesIntent = new Intent(this, SettingsActivity.class);
+        startActivity(preferencesIntent);
+
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -139,6 +150,14 @@ public class QuizActivity extends AppCompatActivity {
                         }
                         else{
                             // must select one region--set North America as default
+                            SharedPreferences.Editor editor =
+                                    sharedPreferences.edit();
+                            regions.add(getString(R.string.default_region));
+                            editor.putStringSet(REGIONS, regions);
+                            editor.apply();
+
+                            Toast.makeText(QuizActivity.this, R.string.default_region_message,
+                                    Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
