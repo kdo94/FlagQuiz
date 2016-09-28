@@ -18,7 +18,6 @@ import android.widget.Toast;
 import java.util.Set;
 
 import static android.R.attr.key;
-import static android.R.attr.settingsActivity;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -91,7 +90,7 @@ public class QuizActivity extends AppCompatActivity {
                     PreferenceManager.getDefaultSharedPreferences(this));
             quizFragment.resetQuiz();
             preferenceChanged = false;
-            )
+
         }
     }
 
