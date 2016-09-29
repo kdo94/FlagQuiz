@@ -6,18 +6,13 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import java.util.Set;
-
-import static android.R.attr.key;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -26,7 +21,7 @@ public class QuizActivity extends AppCompatActivity {
     public static final String REGIONS = "pref_regionsToInclude";
 
     private boolean phoneDevice = true; // used to force portrait mode
-    private boolean preferenceChanged = true; // Did preferences change?
+    private boolean preferencesChanged = true; // Did preferences change?
 
     /**
      * onCreate generates the appropriate layout to infalte, depending on the
@@ -50,7 +45,7 @@ public class QuizActivity extends AppCompatActivity {
         // Register listener for SharedPreferences changes
         PreferenceManager.getDefaultSharedPreferences(this).
                 registerOnSharedPreferenceChangeListener(
-                        preferencesChangedListener);
+                        preferencesChangeListener);
 
         // Determine the screen size
         int screenSize = getResources().getConfiguration().screenLayout &
@@ -64,22 +59,13 @@ public class QuizActivity extends AppCompatActivity {
         // If running on a phone-sized device, allow only portrait orientation
         if(phoneDevice)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        if(preferenceChanged){
+        if(preferencesChanged){
             // Now that the default preferences have been set up,
             // initialize QuizActivityFragment and start the quiz
             QuizActivityFragment quizFragment = (QuizActivityFragment)
@@ -89,7 +75,7 @@ public class QuizActivity extends AppCompatActivity {
             quizFragment.updateRegions(
                     PreferenceManager.getDefaultSharedPreferences(this));
             quizFragment.resetQuiz();
-            preferenceChanged = false;
+            preferencesChanged = false;
 
         }
     }
@@ -113,30 +99,20 @@ public class QuizActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
        Intent preferencesIntent = new Intent(this, SettingsActivity.class);
         startActivity(preferencesIntent);
-
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
-    private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangedListener =
+    private SharedPreferences.OnSharedPreferenceChangeListener preferencesChangeListener =
             new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
-                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-                    preferenceChanged = true; // user changed app setting
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    preferencesChanged = true; // user changed app setting
 
                     QuizActivityFragment quizFragment = (QuizActivityFragment)
                             getSupportFragmentManager().findFragmentById(R.id.quizFragment);
 
                     if (key.equals(CHOICES)){ // # of choices to display
+                        quizFragment.updateGuessRows(sharedPreferences);
                         quizFragment.resetQuiz();
                     }
                     else if(key.equals(REGIONS)){
@@ -159,6 +135,7 @@ public class QuizActivity extends AppCompatActivity {
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
+                    Toast.makeText((QuizActivity.this), R.string.restarting_quiz, Toast.LENGTH_SHORT).show();
                 }
             };
 

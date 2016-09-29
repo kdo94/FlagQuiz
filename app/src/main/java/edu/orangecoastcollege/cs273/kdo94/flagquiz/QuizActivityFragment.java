@@ -51,11 +51,6 @@ public class QuizActivityFragment extends Fragment {
     private LinearLayout[] guessLinearLayout;
     private TextView answerTextView;
 
-    public QuizActivityFragment() {
-
-
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -111,7 +106,7 @@ public class QuizActivityFragment extends Fragment {
                 String[] paths = assets.list(region);
 
                 for (String path : paths)
-                    fileNameList.add(path.replace("png", ""));
+                    fileNameList.add(path.replace(".png", ""));
             }
         }
         catch(IOException exception){
@@ -131,7 +126,7 @@ public class QuizActivityFragment extends Fragment {
             String fileName = fileNameList.get(randomIndex);
 
             if (!quizCountriesList.contains(fileName)){
-                quizCountriesList.add(fileName)
+                quizCountriesList.add(fileName);
                 flagCounter++;
             }
         }
@@ -159,7 +154,10 @@ public class QuizActivityFragment extends Fragment {
             Log.e(TAG, "Error loading " + nextImage, exception);
         }
 
-        Collections.shuffle(fileNameList.remove(correct));
+        Collections.shuffle(fileNameList);
+
+        int correct = fileNameList.indexOf(correctAnswer);
+        fileNameList.add(fileNameList.remove(correct));
 
         for (int row = 0; row < guessRows; row++){
             for (int column = 0; column < guessLinearLayout[row].getChildCount(); column++){
@@ -196,7 +194,8 @@ public class QuizActivityFragment extends Fragment {
 
                 if (correctAnswers == FLAGS_IN_QUIZ){
                     DialogFragment quizResults = new DialogFragment(){
-                        public Dialog onCreateDialong(Bundle bundle){
+                        @Override
+                        public Dialog onCreateDialog(Bundle bundle){
                             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                             builder.setMessage(getString(R.string.results, totalGuesses, (1000 /  (double) totalGuesses)));
 
@@ -214,6 +213,12 @@ public class QuizActivityFragment extends Fragment {
         }
     };
 
+    private String getCountryName(String answer){
+        return "";
+    }
 
+    private void disableButtons(){
+
+    }
 
 }
