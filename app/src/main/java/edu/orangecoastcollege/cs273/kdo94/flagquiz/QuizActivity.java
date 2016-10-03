@@ -76,7 +76,6 @@ public class QuizActivity extends AppCompatActivity {
                     PreferenceManager.getDefaultSharedPreferences(this));
             quizFragment.resetQuiz();
             preferencesChanged = false;
-
         }
     }
 

@@ -208,16 +208,40 @@ public class QuizActivityFragment extends Fragment {
                             return builder.create();
                         }
                     };
+
+                    quizResults.setCancelable(false);
+                    quizResults.show(getFragmentManager(), "quiz results");
+                }
+                else{
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run(){
+                            loadNextFlag();
+                        }
+                    }, 2000);
+
                 }
              }
+            else{
+                answerTextView.setText(R.string.incorrect_answer);
+                answerTextView.setTextColor(getResources().getColor(
+                        R.color.incorrect_answer, getContext().getTheme()));
+                guessButton.setEnabled(false);
+            }
         }
     };
 
-    private String getCountryName(String answer){
-        return "";
+    private String getCountryName(String name){
+        String countryName = name.substring(name.indexOf('-') + 1);
+        return countryName.replace('_', ' ');
     }
 
     private void disableButtons(){
+        for (int row = 0; row < guessRows; row++){
+            LinearLayout guessRow = guessLinearLayout[row];
+            for (int i = 0; i < guessRow.getChildCount(); i++)
+                guessRow.getChildAt(i).setEnabled(false);
+        }
 
     }
 
